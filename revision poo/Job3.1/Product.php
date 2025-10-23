@@ -5,7 +5,7 @@ date_default_timezone_set('Europe/Paris');
 
 class Product
 {
-    private int $id;
+    private int $id = 1;
     private string $name;
     private array $photos;
     private int $price;
@@ -16,14 +16,15 @@ class Product
 
     // Constructeur pour initialiser les propriétés
     public function __construct(
-        int $id,
-        string $name,
-        array $photos,
-        int $price,
-        string $description,
-        int $quantity,
-        DateTime $createdAt,
-        DateTime $updatedAt
+        int $id = 0,
+        string $name = "",
+        array $photos = [],
+        int $price = 0,
+        string $description = "",
+        int $quantity = 0,
+        int $category_id = 0,
+        DateTime $createdAt = new DateTime(),
+        DateTime $updatedAt = new DateTime()
     ) {
         $this->id = $id;
         $this->name = $name;

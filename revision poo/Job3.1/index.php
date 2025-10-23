@@ -22,7 +22,6 @@ $product2 = new Product(
     new DateTime('2025-02-01 11:00:00'),
     new DateTime('2025-02-03 14:00:00')
 );
-$product3 = new Product();
 
 $category1 = new Category(
     25,
@@ -88,4 +87,5 @@ echo "<br>";
 echo "Date de mise a jour : " . $product2->getUpdatedAt()->format('Y-m-d H:i:s');
 echo "<br>";
 echo "<br>";
+$product3 = new Product();
 var_dump($product3);
