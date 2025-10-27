@@ -9,8 +9,6 @@ $product1 = new Product(
     150,
     "Une chaise confortable au design moderne.",
     10,
-    new DateTime('2025-01-01 10:00:00'),
-    new DateTime('2025-01-05 12:00:00')
 );
 $product2 = new Product(
     2,
@@ -19,17 +17,16 @@ $product2 = new Product(
     300,
     "Un écran haute résolution pour une expérience visuelle immersive.",
     5,
-    new DateTime('2025-02-01 11:00:00'),
-    new DateTime('2025-02-03 14:00:00')
 );
 
 $category1 = new Category(
     25,
     "Meubles",
     "Catégorie de meubles divers.",
-    new DateTime('2024-12-01 09:00:00'),
-    new DateTime('2024-12-02 10:00:00')
+    new DateTime('2024-01-15 10:00:00'),
+    new DateTime('2024-01-20 12:00:00')
 );
+$product3 = new Product();
 
 
 // Affichage des propriétés via getters
@@ -87,5 +84,4 @@ echo "<br>";
 echo "Date de mise a jour : " . $product2->getUpdatedAt()->format('Y-m-d H:i:s');
 echo "<br>";
 echo "<br>";
-$product3 = new Product();
 var_dump($product3);
