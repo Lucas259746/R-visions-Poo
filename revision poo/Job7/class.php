@@ -1,0 +1,307 @@
+<?php
+
+declare(strict_types=1);
+date_default_timezone_set('Europe/Paris');
+
+class Product
+{
+    private int $id = 1;
+    private string $name;
+    private array $product_photo;
+    private int $price;
+    private string $description;
+    private int $quantity;
+    private int $category_id;
+    private DateTime $createdAt;
+    private DateTime $updatedAt;
+    private string $db_server = "localhost";
+    private string $db_user = "root";
+    private string $db_password = "";
+    private string $db_name = "draft_shop";
+
+
+    // Constructeur
+    public function __construct(int $id = 0, string $name = "", array $product_photo = [], int $price = 0, string $description = "", int $quantity = 0, int $category_id = 0, DateTime $createdAt = new DateTime(), DateTime $updatedAt = new DateTime())
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->product_photo = $product_photo;
+        $this->price = $price;
+        $this->description = $description;
+        $this->quantity = $quantity;
+        $this->category_id = $category_id;
+        $this->createdAt = $createdAt;
+        $this->updatedAt = $updatedAt;
+    }
+    // Méthode privée pour obtenir une connexion PDO
+    private function PDB_connect(): PDO
+    {
+        try {
+            $pdo = new PDO("mysql:host=$this->db_server;dbname=$this->db_name;", $this->db_user, $this->db_password);
+            // Active le mode exception pour les erreurs SQL
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $pdo;
+        } catch (PDOException $e) {
+            die("Erreur de connexion PDO : " . $e->getMessage());
+        }
+    }
+    // Connexion à la BDD
+    public function DB_connect(int $id)
+    {
+        $conn = $this->PDB_connect();
+
+        $stmt = $conn->prepare("SELECT * FROM product WHERE id = :id LIMIT 1");
+        $stmt->execute([':id' => $id]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = $conn->prepare("SELECT photo_url FROM product_photo WHERE product_id = :id ");
+        $stmt->execute([':id' => $id]);
+        $image = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        $this->id = $product['id'];
+        $this->name = $product['name'];
+        foreach ($image as $product_photo) {
+            $this->product_photo[] = $product_photo['photo_url'];
+        }
+        $this->price = $product['price'];
+        $this->description = $product['description'];
+        $this->quantity = $product['quantity'];
+        $this->category_id = $product['category_id'];
+        $this->createdAt = new DateTime($product['created_at']);
+        $this->updatedAt = new DateTime($product['updated_at']);
+        return true;
+    }
+
+    // Getters
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getPhotos(): array
+    {
+        return $this->product_photo;
+    }
+
+    public function getPrice(): int
+    {
+        return $this->price;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
+
+    public function getCategoryid(): int
+    {
+        return $this->category_id;
+    }
+
+    public function getCreatedAt(): DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    // Setters
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setPhotos(array $product_photo): void
+    {
+        $this->product_photo = $product_photo;
+    }
+
+    public function setPrice(int $price): void
+    {
+        $this->price = $price;
+    }
+
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    public function setQuantity(int $quantity): void
+    {
+        $this->quantity = $quantity;
+    }
+    public function SetCategoryid(int $category_id): void
+    {
+        $this->category_id = $category_id;
+    }
+
+    public function setCreatedAt(DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function setUpdatedAt(DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+    public function getAllInfos(): array
+    {
+        return [
+
+            'id' => $this->id,
+            'name' => $this->name,
+            'photos' => $this->photos,
+            'price' => $this->price,
+            'description' => $this->description,
+            'quantity' => $this->quantity,
+            'category_id' => $this->category_id,
+            'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt
+        ];
+    }
+    public function GetProductFromCategoryId(int $category_id): array
+    {
+        $conn = $this->PDB_connect();
+
+        $stmt = $conn->prepare("SELECT * FROM product WHERE category_id = :category_id");
+        $stmt->execute([':category_id' => $category_id]);
+
+        // Fetch all matching products
+        $products_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $products = [];
+
+        foreach ($products_list as $product) {
+            $products[] = [
+                'id' => $product['id'],
+                'name' => $product['name'],
+                'photo_url' => $product['photo_url'] ?? null, // optional field
+                'price' => $product['price'],
+                'description' => $product['description'],
+                'quantity' => $product['quantity'],
+                'category_id' => $product['category_id'],
+                'created_at' => $product['created_at'],
+                'updated_at' => $product['updated_at'],
+            ];
+        }
+
+        return $products_list;
+    }
+    public function FindOneById(int $id): array
+    {
+        $conn = $this->PDB_connect();
+
+        $stmt = $conn->prepare("SELECT * FROM product WHERE id = :id LIMIT 1");
+        $stmt->execute([':id' => $id]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $product ? $product : [];
+    }
+}
+class Category
+{
+    private int $id = 58;
+    private string $name;
+    private string $description;
+    private DateTime $createdAt;
+    private DateTime $updatedAt;
+    private string $db_server = "localhost";
+    private string $db_user = "root";
+    private string $db_password = "";
+    private string $db_name = "draft_shop";
+
+
+
+    // Constructeur
+    public function __construct(int $id, string $name, string $description, DateTime $createdAt = new DateTime(), DateTime $updatedAt = new DateTime())
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->description = $description;
+        $this->createdAt = $createdAt;
+        $this->updatedAt = $updatedAt;
+    }
+    // Méthode privée pour obtenir une connexion PDO
+    private function PDB_connect(): PDO
+    {
+        try {
+            $pdo = new PDO("mysql:host=$this->db_server;dbname=$this->db_name;", $this->db_user, $this->db_password);
+            // Active le mode exception pour les erreurs SQL
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $pdo;
+        } catch (PDOException $e) {
+            die("Erreur de connexion PDO : " . $e->getMessage());
+        }
+    }
+
+    // Getters
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function getCreatedAt(): DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    // Setters
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
+
+    public function setCreatedAt(DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function setUpdatedAt(DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+}
