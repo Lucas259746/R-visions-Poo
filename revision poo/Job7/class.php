@@ -206,15 +206,19 @@ class Product
 
         return $products_list;
     }
-    public function FindOneById(int $id): array
+    public function FindOneById(int $id): void
     {
         $conn = $this->PDB_connect();
 
         $stmt = $conn->prepare("SELECT * FROM product WHERE id = :id LIMIT 1");
         $stmt->execute([':id' => $id]);
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $product ? $product : [];
+        // Création et hydratation d’un nouvel objet Product
+        //$product = new Product();
+        $this->setId($data['id']);
+        $this->setName($data['name']);
+        $this->setPrice($data['price']);
     }
 }
 class Category

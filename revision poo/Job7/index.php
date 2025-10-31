@@ -9,5 +9,6 @@ echo "<pre>";
 print_r($products);
 echo "</pre>";
 echo "<pre>";
-var_dump($products->FindOneById(3));
+$products->FindOneById(3);
+print_r($products);
 echo "</pre>";
