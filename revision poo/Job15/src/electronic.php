@@ -61,7 +61,7 @@ class Electronic extends AbstractProduct implements StockableInterface
         return $this->brand;
     }
 
-    public function getWarranty_fee(): string
+    public function getWarranty_fee(): int
     {
         return $this->warranty_fee;
     }
@@ -126,7 +126,8 @@ class Electronic extends AbstractProduct implements StockableInterface
                 VALUES (:brand, :warranty_fee, :product_id)
             ");
             // Récupérer l'ID généré automatiquement
-            $this->setId($conn->lastInsertId());
+            $lastId = $conn->lastInsertId();
+            $this->setId((int)$lastId);
             $success = $stmt->execute([
                 ':brand' => $this->brand,
                 ':warranty_fee' => $this->warranty_fee,

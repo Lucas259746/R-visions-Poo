@@ -148,7 +148,8 @@ class Clothing extends AbstractProduct implements StockableInterface
                 VALUES (:size, :color, :type, :material_fee, :product_id)
             ");
             // Récupérer l'ID généré automatiquement
-            $this->setId($conn->lastInsertId());
+            $lastId = $conn->lastInsertId();
+            $this->setId((int)$lastId);
             $success = $stmt->execute([
                 ':size' => $this->size,
                 ':color' => $this->color,
