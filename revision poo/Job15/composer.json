@@ -1,0 +1,17 @@
+{
+
+  "name": "app/app",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+    "authors": [
+       {
+            "name": "Lucas Rozotte",
+            "email": "lucas.rozotte@laplateforme.io"
+        }
+    ],
+    "require": {}
+
+}

@@ -1,15 +1,22 @@
 <?php
 
+namespace App;
 
-include_once 'StockableInterface.php';
+use App\Abstracts\AbstractProduct;
+use App\Interfaces\StockableInterface;
+use PDO;
+use PDOException;
+use Exception;
+use DateTime;
 
-
-class Electronic extends AbstractProduct implements StockableInterface
+class Clothing extends AbstractProduct implements StockableInterface
 {
 
-    private string $brand;
+    private string $size;
     private int $stock = 0;
-    private int $warranty_fee;
+    private string $color;
+    private string $type;
+    private int $material_fee;
     private string $db_server = "localhost";
     private string $db_user = "root";
     private string $db_password = "";
@@ -18,11 +25,13 @@ class Electronic extends AbstractProduct implements StockableInterface
 
 
     // Constructeur
-    public function __construct(int|null $id = 0, string $name = "", array $photos = [], int $price = 0, string $description = "", int $quantity = 0, int $category_id = 0, DateTime $createdAt = new DateTime(), DateTime $updatedAt = new DateTime(), string $brand = "", int $warranty_fee = 0)
+    public function __construct(int $id = 0, string $name = "", array $product_photo = [], int $price = 0, string $description = "", int $quantity = 0, int $category_id = 0, DateTime $createdAt = new DateTime(), DateTime $updatedAt = new DateTime(), string $size = "", string $color = "", string $type = "", int $material_fee = 0)
     {
-        parent::__construct($id, $name, $photos, $price, $description, $quantity, $category_id, $createdAt, $updatedAt);
-        $this->brand = $brand;
-        $this->warranty_fee = $warranty_fee;
+        parent::__construct($id, $name, $product_photo, $price, $description, $quantity, $category_id, $createdAt, $updatedAt);
+        $this->size = $size;
+        $this->color = $color;
+        $this->type = $type;
+        $this->material_fee = $material_fee;
     }
 
     private function PDB_connect(): PDO
@@ -37,7 +46,7 @@ class Electronic extends AbstractProduct implements StockableInterface
         }
     }
 
-    // Getters
+    //getters
 
     public function getName(): string
     {
@@ -49,26 +58,44 @@ class Electronic extends AbstractProduct implements StockableInterface
         return $this->product_photo;
     }
 
-    public function getBrand(): string
+    public function getSize(): string
     {
-        return $this->brand;
+        return $this->size;
     }
 
-    public function getWarranty_fee(): string
+    public function getColor(): string
     {
-        return $this->warranty_fee;
+        return $this->color;
     }
 
-    //Setters
-
-    public function setBrand(string $brand): void
+    public function getType(): string
     {
-        $this->brand = $brand;
+        return $this->type;
     }
 
-    public function setWarranty_fee(int $warranty_fee): void
+    public function getMaterial_fee(): string
     {
-        $this->warranty_fee = $warranty_fee;
+        return $this->material_fee;
+    }
+
+    // Setters 
+    public function setSize(string $size): void
+    {
+        $this->size = $size;
+    }
+
+    public function setColor(string $color): void
+    {
+        $this->color = $color;
+    }
+
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+    public function setMaterial_fee(int $material_fee): void
+    {
+        $this->material_fee = $material_fee;
     }
 
     public function addStocks(int $stock): self
@@ -88,7 +115,9 @@ class Electronic extends AbstractProduct implements StockableInterface
         return $this->stock;
     }
 
-    public function create(): Electronic|false
+
+
+    public function create(): Clothing|false
     {
         try {
             $conn = $this->PDB_connect();
@@ -115,14 +144,16 @@ class Electronic extends AbstractProduct implements StockableInterface
             }
             // 2. Insertion des infos dans la table "clothing"
             $stmt = $conn->prepare("
-                INSERT INTO electronic (brand, warranty_fee,product_id)
-                VALUES (:brand, :warranty_fee, :product_id)
+                INSERT INTO clothing (size, color, type, material_fee, product_id)
+                VALUES (:size, :color, :type, :material_fee, :product_id)
             ");
             // Récupérer l'ID généré automatiquement
             $this->setId($conn->lastInsertId());
             $success = $stmt->execute([
-                ':brand' => $this->brand,
-                ':warranty_fee' => $this->warranty_fee,
+                ':size' => $this->size,
+                ':color' => $this->color,
+                ':type' => $this->type,
+                ':material_fee' => $this->material_fee,
                 ':product_id' => $this->getId()
 
             ]);
@@ -156,7 +187,7 @@ class Electronic extends AbstractProduct implements StockableInterface
         }
     }
 
-    public function update(): Electronic|false
+    public function update(): Clothing|false
     {
         try {
             $conn = $this->PDB_connect();
@@ -188,10 +219,12 @@ class Electronic extends AbstractProduct implements StockableInterface
                 }
             }
             // 2. mise à jour des infos dans la table "electronic"
-            $stmt = $conn->prepare(" UPDATE electronic SET brand=:brand,warranty_fee=:warranty_fee WHERE product_id = :product_id ");
+            $stmt = $conn->prepare(" UPDATE clothing SET size=:size,color=:color,type=:type,material_fee=:material_fee WHERE product_id = :product_id ");
             $success = $stmt->execute([
-                ':brand' => $this->brand,
-                ':warranty_fee' => $this->warranty_fee,
+                ':size' => $this->size,
+                ':color' => $this->color,
+                ':type' => $this->type,
+                ':material_fee' => $this->material_fee,
                 ':product_id' => $this->getId()
 
             ]);
@@ -202,7 +235,7 @@ class Electronic extends AbstractProduct implements StockableInterface
         }
     }
 
-    public function FindElectronicById(int $id): void
+    public function FindClothingById(int $id): void
     {
         $conn = $this->PDB_connect();
 
@@ -230,15 +263,17 @@ class Electronic extends AbstractProduct implements StockableInterface
         }
 
         // 3. Requête infos de electronic
-        $electonicStmt = $conn->prepare("SELECT * FROM electronic WHERE product_id = :id LIMIT 1");
-        $electonicStmt->execute([':id' => $id]);
-        $electronic = $electonicStmt->fetch(PDO::FETCH_ASSOC);
+        $clothingStmt = $conn->prepare("SELECT * FROM clothing WHERE product_id = :id LIMIT 1");
+        $clothingStmt->execute([':id' => $id]);
+        $clothing = $clothingStmt->fetch(PDO::FETCH_ASSOC);
         $this->setPhotos($photos);
-        $this->brand = $electronic['brand'];
-        $this->warranty_fee = $electronic['warranty_fee'];
+        $this->size = $clothing['size'];
+        $this->color = $clothing['color'];
+        $this->type = $clothing['type'];
+        $this->material_fee = $clothing['material_fee'];
     }
 
-    public function FindAllElectronic(): array
+    public function FindAllClothing(): array
     {
         $conn = $this->PDB_connect();
 
@@ -252,11 +287,12 @@ class Electronic extends AbstractProduct implements StockableInterface
             p.category_id,
             p.created_at,
             p.updated_at,
-            e.brand,
-            e.warranty_fee
+            c.size,
+            c.color,
+            c.type,
+            c.material_fee
         FROM product p
-        INNER JOIN electronic e ON p.id = e.product_id
-    ");
+        INNER JOIN clothing c ON p.id = c.product_id ");
         $stmt->execute();
         $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

@@ -1,9 +1,13 @@
 <?php
 
-class Clothing extends AbstractProduct
+include_once 'Abstract_Product.php';
+include_once 'StockableInterface.php';
+
+class Clothing extends AbstractProduct implements StockableInterface
 {
 
     private string $size;
+    private int $stock = 0;
     private string $color;
     private string $type;
     private int $material_fee;
@@ -87,6 +91,25 @@ class Clothing extends AbstractProduct
     {
         $this->material_fee = $material_fee;
     }
+
+    public function addStocks(int $stock): self
+    {
+        $this->stock += $stock;
+        return $this;
+    }
+
+    public function removeStocks(int $stock): self
+    {
+        // Optionnel : prévenir stock négatif
+        $this->stock = max(0, $this->stock - $stock);
+        return $this;
+    }
+    public function getStock(): int
+    {
+        return $this->stock;
+    }
+
+
 
     public function create(): Clothing|false
     {

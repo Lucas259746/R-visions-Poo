@@ -1,8 +1,15 @@
 <?php
 
+declare(strict_types=1);
 
-include_once 'StockableInterface.php';
+namespace App;
 
+use App\Abstracts\AbstractProduct;
+use App\Interfaces\StockableInterface;
+use PDO;
+use PDOException;
+use Exception;
+use DateTime;
 
 class Electronic extends AbstractProduct implements StockableInterface
 {
@@ -18,9 +25,9 @@ class Electronic extends AbstractProduct implements StockableInterface
 
 
     // Constructeur
-    public function __construct(int|null $id = 0, string $name = "", array $photos = [], int $price = 0, string $description = "", int $quantity = 0, int $category_id = 0, DateTime $createdAt = new DateTime(), DateTime $updatedAt = new DateTime(), string $brand = "", int $warranty_fee = 0)
+    public function __construct(int $id = 0, string $name = "", array $product_photo = [], int $price = 0, string $description = "", int $quantity = 0, int $category_id = 0, DateTime $createdAt = new DateTime(), DateTime $updatedAt = new DateTime(), string $brand = "", int $warranty_fee = 0)
     {
-        parent::__construct($id, $name, $photos, $price, $description, $quantity, $category_id, $createdAt, $updatedAt);
+        parent::__construct($id, $name, $product_photo, $price, $description, $quantity, $category_id, $createdAt, $updatedAt);
         $this->brand = $brand;
         $this->warranty_fee = $warranty_fee;
     }
